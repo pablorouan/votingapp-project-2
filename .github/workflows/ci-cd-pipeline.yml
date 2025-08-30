@@ -1,0 +1,78 @@
+name: Voting App CI/CD
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  AWS_REGION: ap-northeast-2
+  CLUSTER_NAME: pablorouan-eks-lab
+  DOCKER_REGISTRY: docker.io
+  IMAGE_TAG: ${{ github.sha }}
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and push vote image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./vote
+          push: true
+          tags: ${{ env.DOCKER_REGISTRY }}/${{ secrets.DOCKER_USERNAME }}/vote:${{ env.IMAGE_TAG }}
+          platforms: linux/amd64,linux/arm64
+
+      - name: Build and push result image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./result
+          push: true
+          tags: ${{ env.DOCKER_REGISTRY }}/${{ secrets.DOCKER_USERNAME }}/result:${{ env.IMAGE_TAG }}
+          platforms: linux/amd64,linux/arm64
+
+      - name: Build and push worker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./worker
+          push: true
+          tags: ${{ env.DOCKER_REGISTRY }}/${{ secrets.DOCKER_USERNAME }}/worker:${{ env.IMAGE_TAG }}
+          platforms: linux/amd64,linux/arm64
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Install eksctl
+        run: |
+          curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
+          sudo mv /tmp/eksctl /usr/local/bin
+
+      - name: Update kubeconfig
+        run: eksctl utils write-kubeconfig --cluster $CLUSTER_NAME --region $AWS_REGION
+
+      - name: Set new image tags
+        run: |
+          kubectl set image deployment/vote vote=${{ env.DOCKER_REGISTRY }}/${{ secrets.DOCKER_USERNAME }}/vote:${{ env.IMAGE_TAG }} -n voting-app
+          kubectl set image deployment/result result=${{ env.DOCKER_REGISTRY }}/${{ secrets.DOCKER_USERNAME }}/result:${{ env.IMAGE_TAG }} -n voting-app
+          kubectl set image deployment/worker worker=${{ env.DOCKER_REGISTRY }}/${{ secrets.DOCKER_USERNAME }}/worker:${{ env.IMAGE_TAG }} -n voting-app
+
+      - name: Apply Kubernetes manifests
+        run: kubectl apply -f K8s/
