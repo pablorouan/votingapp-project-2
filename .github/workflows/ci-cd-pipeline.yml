@@ -1,4 +1,4 @@
-name: Deploy to EKS (deploy-only)
+name: Deploy to EKS (deploy-only, static keys)
 
 on:
   push:
@@ -16,25 +16,25 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     permissions:
-      id-token: write
       contents: read
 
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Configure AWS credentials (OIDC)
+      - name: Configure AWS credentials (static keys)
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-region: ap-northeast-2
-          role-to-assume: ${{ secrets.AWS_IAM_ROLE_ARN }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
       - name: Install kubectl
         uses: azure/setup-kubectl@v4
         with:
           version: "latest"
 
-      - name: Update kubeconfig
+      - name: Update kubeconfig for EKS
         run: |
           aws eks update-kubeconfig \
             --name pablorouan-eks-lab \
@@ -47,7 +47,7 @@ jobs:
       - name: Apply Kubernetes manifests
         run: kubectl apply -n voting-app -f k8s/
 
-      # Pin images to latest on Docker Hub (public)
+      # Pin images to latest on Docker Hub (public images)
       - name: Pin images to latest
         run: |
           kubectl -n voting-app set image deploy/vote    vote=prouan/vote:latest
