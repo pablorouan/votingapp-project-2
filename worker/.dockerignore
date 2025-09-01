@@ -1,0 +1,14 @@
+# Exclude build artifacts and unnecessary files
+bin/
+obj/
+*.md
+*.git
+*.gitignore
+.vscode/
+.git
+node_modules
+bin
+obj
+*.md
+Dockerfile
+.dockerignore
