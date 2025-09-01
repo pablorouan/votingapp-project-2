@@ -21,7 +21,7 @@ spec:
           env:
             - name: REDIS_HOST
               value: redis
-            - name: REDIS_PORT     # 👈 override Kubernetes' auto env
+            - name: REDIS_PORT     
               value: "6379"
 ---
 apiVersion: v1
