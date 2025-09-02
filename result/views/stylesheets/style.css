@@ -88,13 +88,13 @@ body{
   text-transform: uppercase;
 }
 
-#choice .choice.beach{
-  color: #dc6d05;
+#choice .choice.dogs{
+  color: #00cbca;
   float: right;
 }
 
-#choice .choice.city{
-  color: #1af898;
+#choice .choice.cats{
+  color: #2196f3;
   float: left;
 }
 #background-stats{
