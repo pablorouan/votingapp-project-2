@@ -13,7 +13,7 @@ jobs:
     env:
       AWS_REGION: ap-northeast-2
       CLUSTER_NAME: pablorouan-eks-lab
-      ECR_REGISTRY: docker.io/prouan  # You’re using Docker Hub, not ECR
+      ECR_REGISTRY: docker.io/prouan  
 
     steps:
     - name: Checkout Code
