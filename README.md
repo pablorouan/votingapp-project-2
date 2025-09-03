@@ -73,6 +73,7 @@ AWS_ACCESS_KEY_ID	Your AWS access key
 AWS_SECRET_ACCESS_KEY	Your AWS secret key
 DOCKERHUB_USERNAME	Docker Hub username
 DOCKERHUB_TOKEN	Docker Hub personal access token
+
 🧪 Lab Objectives Achieved
 
 ✅ Provisioned secure and scalable EKS cluster
@@ -82,36 +83,6 @@ DOCKERHUB_TOKEN	Docker Hub personal access token
 ✅ Built full GitHub Actions CI/CD pipeline
 ✅ Troubleshooted environment variable issues and DB connectivity
 ✅ Migrated to a monorepo structure for full CI/CD compliance
-
-📸 Gallery of Errors & Learnings
-
-Check out /images (locally) or see our Ironhack presentation for:
-
-Password authentication loops 🧠
-
-Ingress style breakage when switching from path → host routing
-
-Why Redis env var collision caused crash loops
-
-How we fixed PersistentVolumeClaims with gp3 storage class
-
-🧠 Lessons Learned
-
-StatefulSet is essential when dealing with databases and persistent volumes
-
-Secrets must match the app expectation exactly – no room for interpretation
-
-Path-based routing is not ideal when static files are involved
-
-CI ≠ CD — we learned it the hard way and fixed it with a monorepo merge
-
-Automation isn’t just about deploying — it’s about recovering gracefully too
-
-✅ Demo Live (if applicable)
-
-🔗 https://vote.yourdomain.com
-
-🔗 https://result.yourdomain.com
 
 🙌 Authors
 
